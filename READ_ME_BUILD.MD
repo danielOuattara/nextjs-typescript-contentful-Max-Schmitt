@@ -3,7 +3,7 @@
 In this post Max Schmitt shows us how to integrate the Contentful CMS
 with the Next.js App Router.
 
-He goes from Zero to a production-worthy setup that includes:
+He goes from Zero to a Production-Worthy setup that includes:
 
 - TypeScript types for Contentful content
 - Contentful content previews / Next.js draft mode integration
@@ -16,16 +16,36 @@ that Max created based on this blog post.
 
 ## What We'll Build
 
-We're going with a classic example: A blog! Each blog post has
-a title, a slug (which also serves as a unique identifier),
-a body (rich text) and an image.
+We're going with a classic example: A blog!
 
-All put together with a few Tailwind CSS classes, the site will
-look like this: [alt video](https://maxschmitt.me/post-media/nextjs-contentful-typescript/nextjs-contentful-blog.mp4)
+Each blog post has a `title`, a `slug`, which also serves
+as a unique identifier, a `body` (rich text) and an `image`.
+
+All put together with a few `Tailwind CSS classes`, the site
+will look like this:
+
+---
+
+<video width="auto" controls>
+  <source src="https://maxschmitt.me/post-media/nextjs-contentful-typescript/nextjs-contentful-blog.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
+---
 
 You can also check it out live here: [nextjs-contentful-typescript.vercel.app](https://nextjs-contentful-typescript.vercel.app/)
 
-In the Contentful UI, this is what our Blog Post content type looks like: ![alt image](https://maxschmitt.me/post-media/nextjs-contentful-typescript/contentful-content-model-blog-post.jpg)
+In the Contentful UI, this is what our Blog Post content type
+looks like:
+
+![alt image](https://maxschmitt.me/post-media/nextjs-contentful-typescript/contentful-content-model-blog-post.jpg)
+
+##  Setting up your Contentful
+
+- create a Contentful account if you haven't already
+- create a `blogPosts` project
+- add the content-type from the image above
+- then you can start working on Next.js environment
 
 ##  Setting up Environment Variables
 
@@ -37,11 +57,17 @@ In the Contentful UI, this is what our Blog Post content type looks like: ![alt 
   - `CONTENTFUL_MANAGEMENT_TOKEN=...# Used to generate TypeScript types for Contentful`
   - `CONTENTFUL_PREVIEW_SECRET=...# Used to allow only editors to access preview mode`
   
-Note:
+**Note:**
 
-- To get the correct values for `CONTENTFUL_SPACE_ID`, `CONTENTFUL_ACCESS_TOKEN` and `CONTENTFUL_PREVIEW_ACCESS_TOKEN`, log into Contentful, go to `Settings -> API keys` and then click `Add API key`.
+- To get the correct values for :
+  - `CONTENTFUL_SPACE_ID`
+  - `CONTENTFUL_ACCESS_TOKEN`
+  - `CONTENTFUL_PREVIEW_ACCESS_TOKEN`
+  
+  log into Contentful, go to `Settings -> API keys` and then click `Add API key`.
 
-- You can get the `CONTENTFUL_MANAGEMENT_TOKEN` by going to `Settings -> API keys`, clicking the Content management tokens tab and then clicking `Generate personal token`.
+- You can get the `CONTENTFUL_MANAGEMENT_TOKEN` by going to `Settings -> API keys`,
+  clicking the Content management tokens tab and then clicking `Generate personal token`.
 
 - The `CONTENTFUL_PREVIEW_SECRET` we will choose ourselves, so you can put here whatever you like.
 
@@ -50,29 +76,35 @@ Note:
 With the environment variables in place, we can now
 generate TypeScript types for our Contentful content.
 
-- First, install the contentful and cf-content-types-generator packages:
+- First, install the `contentful` and `cf-content-types-generator` packages:
 
-`npm i contentful && npm i -D cf-content-types-generator`
+  ```bash
+  npm i contentful && npm i -D cf-content-types-generator
+  ```
 
 - Next, update your `scripts` in the  `package.json`:
 
-```json
-  "scripts": {
-    "types:contentful": "export $(cat .env.local | awk '!/^\\s*#/' | awk '!/^\\s*$/'); cf-content-types-generator --spaceId $CONTENTFUL_SPACE_ID --token $CONTENTFUL_MANAGEMENT_TOKEN -o src/contentful/types -X && prettier --write src/contentful/types"
-  },
-```
+  ```json
+    "scripts": {
+      "types:contentful": "export $(cat .env.local | awk '!/^\\s*#/' | awk '!/^\\s*$/'); cf-content-types-generator --spaceId $CONTENTFUL_SPACE_ID --token $CONTENTFUL_MANAGEMENT_TOKEN -o src/contentful/types -X && prettier --write src/contentful/types"
+    },
+  ```
 
-- Finally run this script: `npm run types:contentful`
+- Finally run this script:
+
+  ```bash
+  npm run types:contentful
+  ```
 
 This will create the following files:
 
-```json
-src/
- contentful/
-  types/
-   index.ts
-   TypeBlogPost.ts
-```
+  ```bash
+  src/
+  contentful/
+    types/
+    index.ts
+    TypeBlogPost.ts
+  ```
 
 ## Fetching Content from Contentful
 
@@ -82,7 +114,7 @@ Using our freshly-generated types, let's fetch some content from Contentful.
 
 ```ts
 
-/* src/contentful/contentfulClient.ts */
+// src/contentful/contentfulClient.ts
 
 /**
  * Using our freshly-generated types, let's fetch some content from Contentful.
@@ -287,11 +319,14 @@ export function parseContentfulContentImage(
 ## A Note on Images and Contentful
 
 - Each image that gets uploaded on Contentful has a description field. This is perfect for our alt text.
-![alt image](https://maxschmitt.me/post-media/nextjs-contentful-typescript/contentful-image-description-as-alt-attribute.jpg)
+  
+  ![alt image](https://maxschmitt.me/post-media/nextjs-contentful-typescript/contentful-image-description-as-alt-attribute.jpg)
 
-- To make Contentful images mobile-friendly, we can use the powerful `Contentful Images API`. Thanks to it, we don't even need to use the `next/image` component.
+- To make Contentful images mobile-friendly, we can use the powerful `Contentful Images API`.
+  Thanks to it, we don't even need to use the `next/image` component.
 
-- When we render the blog post image (shortly in this post), you can see how we use the `Images API` and the `srcSet` attribute to render responsive images.
+- When we render the blog post image (shortly in this post), you can see how we use the
+  `Images API` and the `srcSet` attribute to render responsive images.
 
 - Overall we're writing quite a bit of boilerplate to fetch and prepare our Contentful content. This is of course optional but well worth it in my opinion, otherwise we'd just be moving the same boilerplate to multiple places throughout the codebase.
 
@@ -395,7 +430,7 @@ export async function generateMetadata(
  * The actual blog post page content
  */
 
-export default async function SingleblogPostPage({ params }: IBlogPostPageProps) {
+export default async function SingleBlogPostPage({ params }: IBlogPostPageProps) {
   /* Fetch a single blog post by slug: using the content preview if draft mode is enabled: */
 
   const singlePost = await fetchSingleBlogPost({
