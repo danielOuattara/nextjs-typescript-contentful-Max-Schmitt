@@ -3,7 +3,7 @@ import { draftMode } from "next/headers";
 import { fetchBlogPosts } from "@/contentful/blogPosts";
 import Link from "next/link";
 
-export default async function Home() {
+export default async function HomePage() {
   /* Fetch blog posts using the content preview if draft mode is enabled: */
 
   const blogPosts = await fetchBlogPosts({ preview: draftMode().isEnabled });

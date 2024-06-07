@@ -51,7 +51,7 @@ export async function generateMetadata(
  * The actual blog post page content
  */
 
-export default async function SingleblogPostPage({
+export default async function SingleBlogPostPage({
   params,
 }: IBlogPostPageProps) {
   /**
